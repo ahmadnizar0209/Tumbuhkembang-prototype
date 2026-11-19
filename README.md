@@ -1,4 +1,4 @@
-# TumbuhKembang — interactive prototype (Stage 7, v1.6.1)
+# TumbuhKembang — interactive prototype (Stage 7, v1.7)
 
 Offline HTML prototype of TumbuhKembang, an ABA data-collection app for behaviour therapists (iPhone and iPad).
 
@@ -10,6 +10,7 @@ Offline HTML prototype of TumbuhKembang, an ABA data-collection app for behaviou
 - v1.3 (19 Nov 2026): the prompt hierarchy in Ubah Program is a checklist (D-15) — tick only the levels a programme uses; the live session card shows just those.
 - v1.3.1 (19 Nov 2026): fix — on iPad the banner ad was rendered outside the visible detail pane on Pengaturan, so it never appeared.
 - v1.3.2 (19 Nov 2026): wording — the Jadwal week view is now labelled "Pekan" instead of "Minggu", which also means Sunday.
+- v1.7 (19 Nov 2026): Riwayat Sesi is grouped by month (D-19) — the newest month is open, older months are collapsed behind a header with a session count.
 - v1.6.1 (19 Nov 2026): fix — the calendar icon ships without a size, so inside the new "Jadwalkan Sesi" button it filled the whole card. Icons without an explicit size are now constrained inside buttons, and the button uses the olive secondary colour.
 - v1.6 (19 Nov 2026): the client screen gains "Jadwalkan Sesi" (D-18) — the appointment form opens with that client already set. Saving any appointment now warns if it clashes with another client.
 - v1.5 (19 Nov 2026): "Mulai Sesi" on the client screen now checks the calendar first (D-17) — it uses a schedule within 15 minutes either side of now, otherwise it offers an incidental 60-minute schedule or starting with none, and warns about clashes with other clients.
