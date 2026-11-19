@@ -1,4 +1,4 @@
-# TumbuhKembang — interactive prototype (Stage 7, v1.10)
+# TumbuhKembang — interactive prototype (Stage 7, v1.11)
 
 Offline HTML prototype of TumbuhKembang, an ABA data-collection app for behaviour therapists (iPhone and iPad).
 
@@ -10,6 +10,7 @@ Offline HTML prototype of TumbuhKembang, an ABA data-collection app for behaviou
 - v1.3 (19 Nov 2026): the prompt hierarchy in Ubah Program is a checklist (D-15) — tick only the levels a programme uses; the live session card shows just those.
 - v1.3.1 (19 Nov 2026): fix — on iPad the banner ad was rendered outside the visible detail pane on Pengaturan, so it never appeared.
 - v1.3.2 (19 Nov 2026): wording — the Jadwal week view is now labelled "Pekan" instead of "Minggu", which also means Sunday.
+- v1.11 (19 Nov 2026): Riwayat Sesi now reads oldest to newest (D-23) at every level — year, month and session. The newest month is still the one open, now at the bottom.
 - v1.10 (19 Nov 2026): archiving a client now deletes its upcoming appointments (D-22) — the confirmation says how many and warns it cannot be undone. Any leftover slot an archived client still has is inert until the client is restored.
 - v1.9 (19 Nov 2026): on iPad the banner moves to the bottom of the client-list sidebar (D-21), so it shows whatever the detail pane or client tab is. It is now the only banner on iPad; ADS02 is unchanged.
 - v1.8 (19 Nov 2026): once a client's history crosses a year, Riwayat Sesi gains a year tier above the months (D-20) — newest year open with its newest month, older years collapsed. Hidden while all sessions are in one year.
