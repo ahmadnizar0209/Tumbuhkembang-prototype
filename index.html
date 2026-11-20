@@ -689,25 +689,28 @@ function dxField(m){const cu=dxCustom();const q=x=>JSON.stringify(x).replace(/"/
    ${own.length?`<optgroup label="Daftar klinik">${own.map(opt).join('')}</optgroup>`:''}
    <option value="__new">Lainnya — tulis sendiri…</option></select>
   ${m.dx.length?`<div class="chips mt8">${m.dx.map(x=>`<button type="button" class="chip on" onclick="dxDrop(${q(x)})" aria-label="Hapus ${esc(x)}">${esc(x)}<i class="xc">×</i></button>`).join('')}</div>`:`<p class="tiny muted" style="margin:6px 2px 0">Belum ada diagnosis dipilih. Boleh dikosongkan.</p>`}
-  ${m.dxAdd?`<div class="flex mt8" style="gap:6px"><input id="dx-new" class="grow" maxlength="${DX_MAX}" placeholder="mis. Gangguan bahasa ekspresif" onkeydown="if(event.key==='Enter'){event.preventDefault();dxAdd()}"><button type="button" class="btn sm pri" onclick="dxAdd()">Tambah</button></div>
+  ${m.dxAdd?`<div class="flex mt8" style="gap:6px"><input id="dx-new" class="grow" maxlength="${DX_MAX}" value="${esc(m.dxText||'')}" placeholder="mis. Gangguan bahasa ekspresif" onkeydown="if(event.key==='Enter'){event.preventDefault();dxAdd()}"><button type="button" class="btn sm pri" onclick="dxAdd()">Tambah</button></div>
    <p class="tiny muted" style="margin:6px 2px 0">Tersimpan untuk klinik ini dan muncul lagi pada klien berikutnya.</p>
    ${cu.length?`<div class="chips mt8">${cu.map(x=>`<button type="button" class="chip" onclick="dxForget(${q(x)})" aria-label="Hapus ${esc(x)} dari daftar klinik">${esc(x)}<i class="xc">×</i></button>`).join('')}</div><p class="tiny muted" style="margin:6px 2px 0">Ketuk × untuk menghapus dari daftar klinik.</p>`:''}`:''}`;}
+/* keep what was typed across a redraw, and across closing and reopening the field */
+function dxStash(){const m=state.modal,el=$('dx-new');if(el)m.dxText=el.value;}
 function dxKeep(){const m=state.modal;['code','name','dob','guardian','start'].forEach(k=>{const el=$('cf-'+k);if(el)m.keep=Object.assign(m.keep||{},{[k]:el.value});});
  const sx=$('cf-sex');if(sx)m.keep=Object.assign(m.keep||{},{sex:sx.value});}
 /* stored in the list's own order, so two clients with the same diagnoses read alike */
 const dxOrder=a=>{const all=DX.concat(dxCustom());return a.slice().sort((x,y)=>all.indexOf(x)-all.indexOf(y));};
 function dxSel(v){const m=state.modal;if(!v)return;
  if(v==='__new'){dxAddOpen();return;}
- dxKeep();if(!m.dx.includes(v))m.dx=dxOrder(m.dx.concat(v));renderApp();}
-function dxDrop(x){const m=state.modal;dxKeep();m.dx=m.dx.filter(y=>y!==x);renderApp();}
-function dxAddOpen(){const m=state.modal;dxKeep();m.dxAdd=!m.dxAdd;renderApp();if(m.dxAdd)setTimeout(()=>{const el=$('dx-new');if(el)el.focus();},30);}
+ dxKeep();dxStash();m.dxAdd=false;                       /* picking one closes the typing field */
+ if(!m.dx.includes(v))m.dx=dxOrder(m.dx.concat(v));renderApp();}
+function dxDrop(x){const m=state.modal;dxKeep();dxStash();m.dx=m.dx.filter(y=>y!==x);renderApp();}
+function dxAddOpen(){const m=state.modal;dxKeep();if(m.dxAdd)dxStash();m.dxAdd=!m.dxAdd;renderApp();if(m.dxAdd)setTimeout(()=>{const el=$('dx-new');if(el){el.focus();el.select();}},30);}
 function dxAdd(){const m=state.modal,el=$('dx-new');if(!el)return;
  const v=el.value.trim().replace(/\s+/g,' ').slice(0,DX_MAX);
  if(!v){toast('Tulis dulu diagnosisnya');return;}
  dxKeep();const cu=dxCustom();const same=DX.concat(cu).find(x=>x.toLowerCase()===v.toLowerCase());
- if(same){if(!m.dx.includes(same))m.dx=dxOrder(m.dx.concat(same));m.dxAdd=false;renderApp();toast('Sudah ada di daftar · dipilih');return;}
- cu.push(v);m.dx=dxOrder(m.dx.concat(v));m.dxAdd=false;renderApp();toast('Ditambahkan ke daftar klinik');}
-function dxForget(x){const cu=dxCustom(),i=cu.indexOf(x);if(i<0)return;dxKeep();
+ if(same){if(!m.dx.includes(same))m.dx=dxOrder(m.dx.concat(same));m.dxAdd=false;m.dxText='';renderApp();toast('Sudah ada di daftar · dipilih');return;}
+ cu.push(v);m.dx=dxOrder(m.dx.concat(v));m.dxAdd=false;m.dxText='';renderApp();toast('Ditambahkan ke daftar klinik');}
+function dxForget(x){const cu=dxCustom(),i=cu.indexOf(x);if(i<0)return;dxKeep();dxStash();
  cu.splice(i,1);const m=state.modal;m.dx=m.dx.filter(y=>y!==x);renderApp();
  toast('Dihapus dari daftar · data klien yang sudah tersimpan tidak berubah');}
 function saveClient(){
