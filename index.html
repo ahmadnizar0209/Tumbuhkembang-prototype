@@ -126,6 +126,7 @@ button.row:active{background:var(--forestT)}
 .link{border:0;background:none;color:var(--tx);text-decoration:underline;font-weight:600;padding:6px 0}
 
 /* chips & badges */
+
 .chip{border:1px solid var(--line);background:var(--card);color:var(--tx);border-radius:99px;padding:0 12px;min-height:34px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
 .chip.on{background:var(--oliveT);border:2px solid var(--olive);color:var(--tx);font-weight:800}
 .chip.add{border-style:dashed;border-color:var(--tx2);font-weight:700}
@@ -147,6 +148,7 @@ button.row:active{background:var(--forestT)}
 .fld{display:block;margin-bottom:12px}
 .fld>span{display:block;font-size:12.5px;font-weight:600;color:var(--tx2);margin-bottom:4px}
 .fld input,.fld select,.fld textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--card);color:var(--tx);font-size:15px}
+.fld select.ph,select.ph{color:var(--grey)}.fld select.ph option,select.ph option{color:var(--tx)}
 .fld textarea{min-height:76px;resize:vertical}
 .fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid var(--olive);outline-offset:0}
 .err{color:var(--red);font-size:12.5px;font-weight:600;margin-top:4px}
@@ -681,8 +683,8 @@ function dxField(m){const cu=dxCustom();const q=x=>JSON.stringify(x).replace(/"/
  const free=a=>a.filter(x=>!m.dx.includes(x));
  const opt=x=>`<option value="${esc(x)}">${esc(x)}</option>`;
  const std=free(DX),own=free(cu);
- return `<select id="dx-sel" aria-label="Tambah diagnosis" onchange="dxSel(this.value)">
-   <option value="">+ Tambah diagnosis…</option>
+ return `<select id="dx-sel" class="ph" aria-label="Tambah diagnosis" onchange="dxSel(this.value)">
+   <option value="">mis. Spektrum autisme</option>
    ${std.map(opt).join('')}
    ${own.length?`<optgroup label="Daftar klinik">${own.map(opt).join('')}</optgroup>`:''}
    <option value="__new">Lainnya — tulis sendiri…</option></select>
