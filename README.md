@@ -1,4 +1,4 @@
-# TumbuhKembang — interactive prototype (Stage 7, v1.13.1)
+# TumbuhKembang — interactive prototype (Stage 7, v1.14)
 
 Offline HTML prototype of TumbuhKembang, an ABA data-collection app for behaviour therapists (iPhone and iPad).
 
@@ -10,6 +10,7 @@ Offline HTML prototype of TumbuhKembang, an ABA data-collection app for behaviou
 - v1.3 (19 Nov 2026): the prompt hierarchy in Ubah Program is a checklist (D-15) — tick only the levels a programme uses; the live session card shows just those.
 - v1.3.1 (19 Nov 2026): fix — on iPad the banner ad was rendered outside the visible detail pane on Pengaturan, so it never appeared.
 - v1.3.2 (19 Nov 2026): wording — the Jadwal week view is now labelled "Pekan" instead of "Minggu", which also means Sunday.
+- v1.14 (20 Nov 2026): the interval-length picker gains "Lainnya…" (D-26) — any length from 5 dtk to 10 mnt, typed in seconds or minutes, comma allowed. The nine presets stay.
 - v1.13.1 (20 Nov 2026): the open question on D-25 is closed — the pilot therapist confirms "duduk tenang 5 menit" means the total within one session, which is what the Menit basis computes.
 - v1.13 (20 Nov 2026): a Durasi target now chooses its mastery basis — Menit (default) or % waktu sesi (D-25). "Duduk tenang" can be set as "≥ 5 menit selama 3 sesi". The percentage stays available and still shows live on the card.
 - v1.12 (20 Nov 2026): Frekuensi is a count, not a rate (D-24) — value, graph and mastery criterion are all in "kali". Per-hour survives only as live context on the session card. Laju is unchanged.
