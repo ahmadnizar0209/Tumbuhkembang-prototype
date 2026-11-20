@@ -672,29 +672,39 @@ function clientFormHTML(m){
  return sheet(m.id?'Ubah Klien':'Klien Baru',`<p class="small muted" style="margin:4px 0 12px">Kode klien tampil di daftar, laporan, dan jadwal. Nama hanya tampil bila diminta.</p>
   ${f('code','Kode klien','text',1,'mis. RZ-07')}${f('name','Nama (opsional)','text',0,'')}${f('dob','Tanggal lahir','date',0)}
   <label class="fld"><span>Jenis kelamin</span><select id="cf-sex"><option value="">–</option>${[['L','Laki-laki'],['P','Perempuan']].map(([k,l])=>`<option value="${k}" ${(kp.sex!=null?kp.sex:c.sex)===k?'selected':''}>${l}</option>`).join('')}</select></label>
-  <div class="fld"><span>Diagnosis (opsional)</span>${dxChips(m)}</div>
+  <div class="fld"><span>Diagnosis (opsional)</span>${dxField(m)}</div>
   ${f('guardian','Wali','text',0)}${f('start','Tanggal mulai terapi','date',0)}`,
   {right:`<button class="nb" onclick="saveClient()">Simpan</button>`});
 }
-/* D-32: multi-select, because co-occurring diagnoses are the norm here */
-function dxChips(m){const cu=dxCustom();
- const chip=x=>{const on=m.dx.includes(x),v=JSON.stringify(x).replace(/"/g,'&quot;');
-  return `<button type="button" class="chip ${on?'on':''}" onclick="dxPick(${v})">${esc(x)}${cu.includes(x)&&m.dxAdd?`<i class="xc" onclick="event.stopPropagation();dxForget(${v})" role="button" aria-label="Hapus ${esc(x)} dari daftar">×</i>`:''}</button>`;};
- return `<div class="chips">${DX.concat(cu).map(chip).join('')}<button type="button" class="chip dash" onclick="dxAddOpen()">+ Tambah sendiri</button></div>
+/* D-32: a dropdown of the defined diagnoses, several per client, "Lainnya" at the end */
+function dxField(m){const cu=dxCustom();const q=x=>JSON.stringify(x).replace(/"/g,'&quot;');
+ const free=a=>a.filter(x=>!m.dx.includes(x));
+ const opt=x=>`<option value="${esc(x)}">${esc(x)}</option>`;
+ const std=free(DX),own=free(cu);
+ return `<select id="dx-sel" aria-label="Tambah diagnosis" onchange="dxSel(this.value)">
+   <option value="">+ Tambah diagnosis…</option>
+   ${std.map(opt).join('')}
+   ${own.length?`<optgroup label="Daftar klinik">${own.map(opt).join('')}</optgroup>`:''}
+   <option value="__new">Lainnya — tulis sendiri…</option></select>
+  ${m.dx.length?`<div class="chips mt8">${m.dx.map(x=>`<button type="button" class="chip on" onclick="dxDrop(${q(x)})" aria-label="Hapus ${esc(x)}">${esc(x)}<i class="xc">×</i></button>`).join('')}</div>`:`<p class="tiny muted" style="margin:6px 2px 0">Belum ada diagnosis dipilih. Boleh dikosongkan.</p>`}
   ${m.dxAdd?`<div class="flex mt8" style="gap:6px"><input id="dx-new" class="grow" maxlength="${DX_MAX}" placeholder="mis. Gangguan bahasa ekspresif" onkeydown="if(event.key==='Enter'){event.preventDefault();dxAdd()}"><button type="button" class="btn sm pri" onclick="dxAdd()">Tambah</button></div>
-   <p class="tiny muted" style="margin:6px 2px 0">Tersimpan untuk klinik ini dan muncul lagi pada klien berikutnya.${cu.length?' Ketuk × pada diagnosis buatan sendiri untuk menghapusnya dari daftar.':''}</p>`:''}`;}
+   <p class="tiny muted" style="margin:6px 2px 0">Tersimpan untuk klinik ini dan muncul lagi pada klien berikutnya.</p>
+   ${cu.length?`<div class="chips mt8">${cu.map(x=>`<button type="button" class="chip" onclick="dxForget(${q(x)})" aria-label="Hapus ${esc(x)} dari daftar klinik">${esc(x)}<i class="xc">×</i></button>`).join('')}</div><p class="tiny muted" style="margin:6px 2px 0">Ketuk × untuk menghapus dari daftar klinik.</p>`:''}`:''}`;}
 function dxKeep(){const m=state.modal;['code','name','dob','guardian','start'].forEach(k=>{const el=$('cf-'+k);if(el)m.keep=Object.assign(m.keep||{},{[k]:el.value});});
  const sx=$('cf-sex');if(sx)m.keep=Object.assign(m.keep||{},{sex:sx.value});}
 /* stored in the list's own order, so two clients with the same diagnoses read alike */
 const dxOrder=a=>{const all=DX.concat(dxCustom());return a.slice().sort((x,y)=>all.indexOf(x)-all.indexOf(y));};
-function dxPick(x){const m=state.modal;dxKeep();m.dx=m.dx.includes(x)?m.dx.filter(y=>y!==x):m.dx.concat(x);renderApp();}
+function dxSel(v){const m=state.modal;if(!v)return;
+ if(v==='__new'){dxAddOpen();return;}
+ dxKeep();if(!m.dx.includes(v))m.dx=dxOrder(m.dx.concat(v));renderApp();}
+function dxDrop(x){const m=state.modal;dxKeep();m.dx=m.dx.filter(y=>y!==x);renderApp();}
 function dxAddOpen(){const m=state.modal;dxKeep();m.dxAdd=!m.dxAdd;renderApp();if(m.dxAdd)setTimeout(()=>{const el=$('dx-new');if(el)el.focus();},30);}
 function dxAdd(){const m=state.modal,el=$('dx-new');if(!el)return;
  const v=el.value.trim().replace(/\s+/g,' ').slice(0,DX_MAX);
  if(!v){toast('Tulis dulu diagnosisnya');return;}
  dxKeep();const cu=dxCustom();const same=DX.concat(cu).find(x=>x.toLowerCase()===v.toLowerCase());
- if(same){if(!m.dx.includes(same))m.dx=m.dx.concat(same);m.dxAdd=false;renderApp();toast('Sudah ada di daftar · dipilih');return;}
- cu.push(v);m.dx=m.dx.concat(v);m.dxAdd=false;renderApp();toast('Ditambahkan ke daftar klinik');}
+ if(same){if(!m.dx.includes(same))m.dx=dxOrder(m.dx.concat(same));m.dxAdd=false;renderApp();toast('Sudah ada di daftar · dipilih');return;}
+ cu.push(v);m.dx=dxOrder(m.dx.concat(v));m.dxAdd=false;renderApp();toast('Ditambahkan ke daftar klinik');}
 function dxForget(x){const cu=dxCustom(),i=cu.indexOf(x);if(i<0)return;dxKeep();
  cu.splice(i,1);const m=state.modal;m.dx=m.dx.filter(y=>y!==x);renderApp();
  toast('Dihapus dari daftar · data klien yang sudah tersimpan tidak berubah');}
@@ -1662,7 +1672,8 @@ function renderNotes(){
  <p><b class="dec">D-32 &mdash; the client record carries a diagnosis.</b> From the pilot therapist: <i>"biasanya di klinik itu anaknya udah dapet diagnosis. Jadi mungkin lebih baik ditambahkan kolom baru untuk diagnosis di identitas pasien."</i> The record held kode klien, name, date of birth, sex, guardian and start date &mdash; a child arriving at a child-development clinic has usually been diagnosed elsewhere, and there was nowhere to put it.</p>
  <ul>
   <li><b>Diagnosis</b> sits between Jenis kelamin and Wali on Klien Baru and Ubah Klien. <b>Optional</b> &mdash; a child may arrive without one.</li>
-  <li><b>Multi-select</b>, because co-occurring diagnoses are the norm here; forcing one would make the field a lie rather than a gap. Eight common ones as chips, plus <b>"+ Tambah sendiri"</b> kept per clinic and offered for every client afterwards &mdash; the D-14 pattern, for the same reason.</li>
+  <li><b>A dropdown</b> of the eight defined diagnoses, picked one at a time; each pick becomes a chip below with &times; to remove, and drops out of the list until it is. <b>Several per client</b>, because co-occurring diagnoses are the norm here &mdash; forcing one would make the field a lie rather than a gap.</li>
+  <li><b>"Lainnya &mdash; tulis sendiri…"</b> is the last entry in the dropdown, as in the D-26 interval picker. What the clinic types is kept and offered for every client afterwards under <i>Daftar klinik</i> &mdash; the D-14 pattern, for the same reason. The clinic's own entries can be removed from that list while the typing field is open.</li>
   <li>The record stores the <b>chosen text</b>, so one later removed from the list still reads correctly in records that carry it. Stored in the list's own order, so two clients with the same diagnoses read alike.</li>
   <li>Shown on the <b>client screen</b>, since that is the clinical record. In both reports only when <b>"Sertakan diagnosis"</b> is on &mdash; a toggle of its own, <b>default off</b>, independent of the name.</li>
   <li><b>Why its own toggle.</b> A diagnosis is more sensitive than a name, not less: under UU PDP 27/2022 health data is <i>data pribadi yang bersifat spesifik</i>, and this is health data about a child. Tying it to the name would force a therapist naming the child for a parent to also state the diagnosis, and one sending diagnosis context to a paediatrician to also name the child. Different disclosures, decided separately.</li>
